@@ -26,7 +26,7 @@ ros2 launch robot_bringup robot_bringup.launch.py
 rviz2
 ```
 
-# Todo
+## Todo
 - test publishing /joy from host with xbox controller
 - need to install and test realsense node on robot
 - need to install and test ros2 nav2 on robot
