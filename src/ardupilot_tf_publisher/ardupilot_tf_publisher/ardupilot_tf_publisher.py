@@ -1,71 +1,97 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
-from geometry_msgs.msg import PoseStamped, TransformStamped
-from geographic_msgs.msg import GeoPointStamped
-import tf2_ros
 
-class ArduPilotTfPublisher(Node):
+from geometry_msgs.msg import PoseStamped, TwistStamped, TransformStamped
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import NavSatFix
+
+from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
+
+
+class ArduPilotOdometryBridge(Node):
+    """
+    Bridges ArduPilot DDS output to ROS2 navigation stack odometry format.
+    Converts ap/pose/filtered + ap/twist/filtered -> /odometry/filtered (odom frame)
+    Also publishes TF transforms for odom->base_footprint and map->base_footprint.
+    """
+    
     def __init__(self):
-        super().__init__('ardupilot_tf_publisher')
-
-        # Define QoS profile
+        super().__init__('ardupilot_odometry_bridge')
+        
+        # QoS profile for ArduPilot DDS topics (typically best effort)
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.VOLATILE,
             history=HistoryPolicy.KEEP_LAST,
-            depth=10,
-            durability=DurabilityPolicy.VOLATILE
+            depth=10
         )
-
-        # Broadcaster for the dynamic odom -> base_link transform
-        self.dynamic_broadcaster = tf2_ros.TransformBroadcaster(self)
-
-        # Broadcaster for the static map -> odom transform
-        self.static_broadcaster = tf2_ros.StaticTransformBroadcaster(self)
-
-        # Flag to ensure we only publish the static transform once
-        self.static_transform_published = False
-
-        # Subscribe to ArduPilot's local pose
+        
+        # Subscribers for ArduPilot topics
         self.pose_sub = self.create_subscription(
             PoseStamped,
             'ap/pose/filtered',
             self.pose_callback,
-            qos_profile)
+            qos_profile
+        )
 
-        # Subscribe to ArduPilot's global origin
-        self.origin_sub = self.create_subscription(
-            GeoPointStamped,
-            'ap/gps_global_origin/filtered',
-            self.origin_callback,
-            qos_profile)
+        self.twist_sub = self.create_subscription(
+            TwistStamped,
+            'ap/twist/filtered',
+            self.twist_callback,
+            qos_profile
+        )
 
+        self.navsat_sub = self.create_subscription(
+            NavSatFix,
+            'ap/navsat',
+            self.navsat_callback,
+            qos_profile
+        )
+
+        # Publishers for ROS2 topics
+        self.odom_pub = self.create_publisher(
+            Odometry,
+            '/odometry/filtered',
+            10
+        )
+
+        self.navsat_pub = self.create_publisher(
+            NavSatFix,
+            'ap/navsat/fix',
+            10
+        )
+        
+        # TF broadcasters
+        self.tf_broadcaster = TransformBroadcaster(self)
+        self.static_tf_broadcaster = StaticTransformBroadcaster(self)
+        
+        # Store latest messages
+        self.latest_pose = None
+        self.latest_twist = None
+
+        # publish static transform
+        self.publish_static_transform();
+    
     def pose_callback(self, msg):
-        # This is for the odom -> base_link transform
-        t = TransformStamped()
+        self.latest_pose = msg
 
-        t.header.stamp = msg.header.stamp
-        t.header.frame_id = 'odom'
-        t.child_frame_id = 'base_link'
+        if self.latest_twist is not None:
+            self.publish_local_odometry()
+    
+    def twist_callback(self, msg):
+        self.latest_twist = msg
 
-        t.transform.translation.x = msg.pose.position.x
-        t.transform.translation.y = msg.pose.position.y
-        t.transform.translation.z = msg.pose.position.z
-        t.transform.rotation = msg.pose.orientation
+        if self.latest_pose is not None:
+            self.publish_local_odometry()
 
-        self.dynamic_broadcaster.sendTransform(t)
+    def navsat_callback(self, msg):
+        msg.header.frame_id = 'gps'
+        self.navsat_pub.publish(msg)
 
-    def origin_callback(self, msg):
-        # This is for the static map -> odom transform
-        if not self.static_transform_published:
-            lat = msg.position.latitude
-            lon = msg.position.longitude
-            
-            self.get_logger().info(
-                f"Received GPS global origin. LAT: {lat}, LON: {lon}. "
-                "Use these values to configure rviz_satellite."
-            )
-
+    def publish_static_transform(self):
             t = TransformStamped()
 
             t.header.stamp = self.get_clock().now().to_msg()
@@ -81,17 +107,55 @@ class ArduPilotTfPublisher(Node):
             t.transform.rotation.z = 0.0
             t.transform.rotation.w = 1.0
 
-            self.static_broadcaster.sendTransform(t)
-            self.static_transform_published = True
-            self.get_logger().info("Published static map -> odom transform.")
+            self.static_tf_broadcaster.sendTransform(t)
 
+    def publish_local_odometry(self):
+        """Publish local odometry (odom frame) from pose and twist."""
+        odom_msg = Odometry()
+        odom_msg.header.stamp = self.latest_pose.header.stamp
+        odom_msg.header.frame_id = 'odom'
+        odom_msg.child_frame_id = 'base_link'
+        
+        # Set pose from ap/pose/filtered
+        odom_msg.pose.pose = self.latest_pose.pose
+        
+        # Set twist from ap/twist/filtered
+        odom_msg.twist.twist = self.latest_twist.twist
+        
+        # Publish odometry message
+        self.odom_pub.publish(odom_msg)
+        
+        # Publish TF transform: odom -> base_footprint
+        tf_msg = TransformStamped()
+        tf_msg.header.stamp = odom_msg.header.stamp
+        tf_msg.header.frame_id = 'odom'
+        tf_msg.child_frame_id = 'base_link'
+        
+        tf_msg.transform.translation.x = self.latest_pose.pose.position.x
+        tf_msg.transform.translation.y = self.latest_pose.pose.position.y
+        #tf_msg.transform.translation.z = self.latest_pose.pose.position.z
+        tf_msg.transform.translation.z = 0.0
+        
+        tf_msg.transform.rotation = self.latest_pose.pose.orientation
+        
+        self.tf_broadcaster.sendTransform(tf_msg)
+
+        self.latest_pose = None
+        self.latest_twist = None
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ArduPilotTfPublisher()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    
+    node = ArduPilotOdometryBridge()
+    
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
