@@ -1,29 +1,32 @@
 # Mowbot with ArduPilot Flight Controller & Raspberry Pi 5 Companion Computer
 ## Bringup Instructions
-### Terminal 1 (robot)
-```
-ssh mowbot-pi5
-sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 2000000
-```
-
-### Terminal 2 (robot)
+### Robot Terminal 1
 ```
 ssh mowbot-pi5
 cd ros2_mowbot_ws/
 source install/setup.bash
-ros2 launch sllidar_ros2 sllidar_s3_launch.py
+sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 2000000
+or (preferred)
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyAMA0 -b 2000000
 ```
 
-### Terminal 3 (host, eventually robot, rolling in lidar above plus realsense)
+### Robot Terminal 2
 ```
+ssh mowbot-pi5
 cd ros2_mowbot_ws/
 source install/setup.bash
 ros2 launch robot_bringup robot_bringup.launch.py
 ```
 
-### Terminal 4 (host)
+### Host Terminal 1
 ```
 rviz2
+```
+
+## Service Calls
+```
+ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors "{arm: true}"
+ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 15}"
 ```
 
 ## Todo
