@@ -32,7 +32,8 @@ def generate_launch_description():
                     'inverted': False, 
                     'angle_compensate': True, 
                     'scan_mode': 'DenseBoost'}],
-        output='screen')
+        output='screen'
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
