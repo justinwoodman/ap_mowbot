@@ -1,13 +1,31 @@
 # Mowbot with ArduPilot Flight Controller & Raspberry Pi 5 Companion Computer
 ## Bringup Instructions
 ### Robot Terminal 1
+# for DDS (DDS must be enabled for FCU serial port)
 ```
 ssh mowbot-pi5
 cd ros2_mowbot_ws/
 source install/setup.bash
 sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 2000000
-or (preferred)
+```
+# or (preferred)
+```
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyAMA0 -b 2000000
+```
+
+# for MAVROS (MAVLINK 2 must be enabled for FCU serial port)
+```
+ssh mowbot-pi5
+cd ros2_mowbot_ws/
+source install/setup.bash
+```
+# for FCU serial connector <-> PI5 header serial
+```
+ros2 launch mavros apm.launch fcu_url:=/dev/ttyAMA0:2000000
+```
+# for FCU USB <-> PI5 USB
+```
+ros2 launch mavros apm.launch fcu_url:=/dev/ttyACM0:2000000
 ```
 
 ### Robot Terminal 2

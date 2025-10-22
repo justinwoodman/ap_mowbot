@@ -25,13 +25,15 @@ def generate_launch_description():
         package='sllidar_ros2',
         executable='sllidar_node',
         name='sllidar_node',
-        parameters=[{'channel_type':'serial',
-                    'serial_port': '/dev/serial/by-path/platform-xhci-hcd.0-usb-0:1:1.0-port0', 
-                    'serial_baudrate': 1000000, 
-                    'frame_id': 'laser',
-                    'inverted': False, 
-                    'angle_compensate': True, 
-                    'scan_mode': 'DenseBoost'}],
+        parameters=[{
+            'channel_type':'serial',
+            'serial_port': '/dev/serial/by-path/platform-xhci-hcd.0-usb-0:1:1.0-port0', 
+            'serial_baudrate': 1000000, 
+            'frame_id': 'laser',
+            'inverted': False, 
+            'angle_compensate': True, 
+            'scan_mode': 'DenseBoost'
+        }],
         output='screen'
     )
 
