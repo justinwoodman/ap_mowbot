@@ -35,19 +35,29 @@ source install/setup.bash
 ros2 launch robot_bringup robot_bringup.launch.py
 ```
 
-### Host Terminal 1
+## Host Terminal 1
 ```
 rviz2
 ```
 
 ## Service Calls
 ```
+# in DDS mode
 ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors "{arm: true}"
 ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 15}"
+
+# in MAVROS mode
+ros2 service call /mavros/cmd/arming mavros_msgs/srv/CommandBool "{value: true}"
+ros2 service call /mavros/set_mode mavros_msgs/srv/SetMode "{custom_mode: MANUAL}"
 ```
 
 ## Todo
-- test publishing /joy from host with xbox controller
 - need to install and test realsense node on robot
 - need to install and test ros2 nav2 on robot
 - sync ROS2 to flight controller time?
+- rename "ardupilot_tf_publisher" something like "ardupilot_odometry_bridge"
+- maybe split out navsat stuff and call it "ardupilot_navsat_bridge"?
+- both could belong to a node called "ardupilot_bridges"?
+
+## Done
+- test publishing /joy from host with xbox controller
