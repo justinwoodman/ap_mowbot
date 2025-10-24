@@ -37,9 +37,25 @@ def generate_launch_description():
         output='screen'
     )
 
+    realsense_node = Node(
+        package="realsense2_camera",
+        executable="realsense2_camera_node",
+        parameters=[{
+            "enable_color" : True,
+            "enable_infra" : False,
+            "enable_infra1" : False,
+            "enable_infra2" : False,
+            "enable_depth" : False,
+            "initial_reset" : True,
+            "rgb_camera.color_profile" : "640x480x30",
+            "rgb_camera.color_QoS" : "SENSOR_DATA",
+        }]
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
         robot_state_publisher_node,
         ardupilot_tf_publisher_node,
         lidar_node,
+        realsense_node,
     ])
