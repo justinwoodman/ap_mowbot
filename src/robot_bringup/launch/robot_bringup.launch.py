@@ -57,5 +57,5 @@ def generate_launch_description():
         robot_state_publisher_node,
         ardupilot_tf_publisher_node,
         lidar_node,
-        realsense_node,
+        #realsense_node,
     ])

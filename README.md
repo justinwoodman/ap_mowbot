@@ -28,6 +28,7 @@ ros2 launch mavros apm.launch fcu_url:=/dev/ttyACM0:2000000
 ```
 
 ## Robot Terminal 2
+### Launches sensors and AP to ROS2 bridges
 ```
 ssh mowbot-pi5
 cd ros2_mowbot_ws/
@@ -36,8 +37,21 @@ ros2 launch robot_bringup robot_bringup.launch.py
 ```
 
 ## Host Terminal 1
+### Start RViz2
 ```
 rviz2
+```
+
+## Host Terminal 2
+### Launch Navigation
+```
+ros2 launch nav2_bringup navigation_launch.py params_file:="/home/ros/Desktop/navigation.config.yaml"
+```
+
+## Host Terminal 3
+### Stamp the cmd_vel messages from Navigation
+```
+ros2 run twist_stamper twist_stamper --ros-args -r cmd_vel_in:=cmd_vel -r cmd_vel_out:=cmd_vel_stamped
 ```
 
 ## Service Calls

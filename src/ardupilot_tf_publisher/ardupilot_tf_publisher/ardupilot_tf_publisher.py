@@ -22,8 +22,16 @@ class ArduPilotOdometryBridge(Node):
         super().__init__('ardupilot_odometry_bridge')
         
         # QoS profile for ArduPilot DDS topics (typically best effort)
-        qos_profile = QoSProfile(
+        qos_profile_ap = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.VOLATILE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+
+        # QoS profile for PC ROS2 topics (typically reliable)
+        qos_profile_pc = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
             durability=DurabilityPolicy.VOLATILE,
             history=HistoryPolicy.KEEP_LAST,
             depth=10
@@ -34,34 +42,47 @@ class ArduPilotOdometryBridge(Node):
             PoseStamped,
             'ap/pose/filtered',
             self.pose_callback,
-            qos_profile
+            qos_profile_ap
         )
 
         self.twist_sub = self.create_subscription(
             TwistStamped,
             'ap/twist/filtered',
             self.twist_callback,
-            qos_profile
+            qos_profile_ap
         )
 
         self.navsat_sub = self.create_subscription(
             NavSatFix,
             'ap/navsat',
             self.navsat_callback,
-            qos_profile
+            qos_profile_ap
+        )
+
+        self.cmd_vel_sub = self.create_subscription(
+            TwistStamped,
+            'cmd_vel_stamped',
+            self.cmd_vel_callback,
+            qos_profile_pc
         )
 
         # Publishers for ROS2 topics
         self.odom_pub = self.create_publisher(
             Odometry,
             '/odometry/filtered',
-            10
+            qos_profile_pc
         )
 
         self.navsat_pub = self.create_publisher(
             NavSatFix,
             'ap/navsat/fix',
-            10
+            qos_profile_pc
+        )
+
+        self.cmd_vel_pub = self.create_publisher(
+            TwistStamped,
+            'ap/cmd_vel',
+            qos_profile_ap
         )
         
         # TF broadcasters
@@ -73,7 +94,7 @@ class ArduPilotOdometryBridge(Node):
         self.latest_twist = None
 
         # publish static transform
-        self.publish_static_transform();
+        self.publish_static_transform()
     
     def pose_callback(self, msg):
         self.latest_pose = msg
@@ -90,6 +111,10 @@ class ArduPilotOdometryBridge(Node):
     def navsat_callback(self, msg):
         msg.header.frame_id = 'gps'
         self.navsat_pub.publish(msg)
+
+    def cmd_vel_callback(self, msg):
+        msg.header.frame_id = 'base_link'
+        self.cmd_vel_pub.publish(msg)
 
     def publish_static_transform(self):
             t = TransformStamped()
