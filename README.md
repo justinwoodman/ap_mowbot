@@ -80,12 +80,12 @@ ros2 service call /mavros/set_mode mavros_msgs/srv/SetMode "{custom_mode: MANUAL
 ```
 
 ## Todo
-- need to install and test realsense node on robot
-- need to install and test ros2 nav2 on robot
+- Robot bringup should start nav2 and twist stamper instead of manually on host
+- nav2 config file should be in bringup package
+- create host_bringup package that starts rviz2, joy, and teleop_twist_joy
 - sync ROS2 to flight controller time?
-- rename "ardupilot_tf_publisher" something like "ardupilot_odometry_bridge"
-- maybe split out navsat stuff and call it "ardupilot_navsat_bridge"?
-- both could belong to a node called "ardupilot_bridges"?
 
 ## Done
 - test publishing /joy from host with xbox controller
+- need to install and test realsense node on robot
+- need to install and test ros2 nav2 on host
