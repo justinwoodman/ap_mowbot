@@ -36,23 +36,17 @@ source install/setup.bash
 ros2 launch robot_bringup robot_bringup.launch.py
 ```
 
-## For Ros2 Nav2 Bringup
+## Robot Terminal 3
+### Launch Navigation
+```
+ros2 launch nav2_bringup navigation_launch.py params_file:="/home/ros/ros2_mowbot_ws/src/robot_bringup/config/navigation.config.yaml"
+```
+
+## For RViz
 ## Host Terminal 1
 ### Start RViz2
 ```
 rviz2
-```
-
-## Host Terminal 2
-### Launch Navigation
-```
-ros2 launch nav2_bringup navigation_launch.py params_file:="/home/ros/Desktop/navigation.config.yaml"
-```
-
-## Host Terminal 3
-### Stamp the cmd_vel messages from Navigation
-```
-ros2 run twist_stamper twist_stamper --ros-args -r cmd_vel_in:=cmd_vel -r cmd_vel_out:=cmd_vel_stamped
 ```
 
 ## For Xbox Controller Teleop Bringup
