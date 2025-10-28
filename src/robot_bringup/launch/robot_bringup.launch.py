@@ -16,12 +16,6 @@ def generate_launch_description():
         parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}],
     )
 
-    # remove this if the next two nodes work
-    ardupilot_tf_publisher_node = Node(
-        package='ardupilot_tf_publisher',
-        executable='ardupilot_tf_publisher',
-    )
-
     ardupilot_odometry_bridge_node = Node(
         package='ardupilot_bridges',
         executable='ap_odometry_bridge',
@@ -30,6 +24,11 @@ def generate_launch_description():
     ardupilot_navsat_bridge_node = Node(
         package='ardupilot_bridges',
         executable='ap_navsat_bridge',
+    )
+
+    ardupilot_cmd_vel_bridge_node = Node(
+        package='ardupilot_bridges',
+        executable='ap_cmd_vel_bridge',
     )
 
     lidar_node = Node(
@@ -66,9 +65,9 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
         robot_state_publisher_node,
-        #ardupilot_tf_publisher_node,
         ardupilot_odometry_bridge_node,
         ardupilot_navsat_bridge_node,
+        ardupilot_cmd_vel_bridge_node,
         lidar_node,
         #realsense_node,
     ])

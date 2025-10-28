@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'ap_odometry_bridge = ardupilot_bridges.ap_odometry_bridge:main',
             'ap_navsat_bridge = ardupilot_bridges.ap_navsat_bridge:main',
+            'ap_cmd_vel_bridge = ardupilot_bridges.ap_cmd_vel_bridge:main',
         ],
     },
 )
