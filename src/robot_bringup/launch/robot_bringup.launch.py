@@ -62,6 +62,20 @@ def generate_launch_description():
         }]
     )
 
+    #ros2 launch nav2_bringup navigation_launch.py params_file:="/home/ros/Desktop/navigation.config.yaml"
+
+    twist_stamper_node = Node(
+        package="twist_stamper",
+        executable="twist_stamper",
+        remappings=[
+            ('cmd_vel_in', 'cmd_vel'),
+            ('cmd_vel_out', 'cmd_vel_stamped'),
+        ],
+        parameters=[
+            {'frame_id': 'base_link'}
+        ]
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
         robot_state_publisher_node,
@@ -70,4 +84,6 @@ def generate_launch_description():
         ardupilot_cmd_vel_bridge_node,
         lidar_node,
         #realsense_node,
+        #navigation_node,
+        twist_stamper_node,
     ])
