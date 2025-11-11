@@ -8,10 +8,16 @@ cd ros2_mowbot_ws/
 source install/setup.bash
 
 # To use MicroXRCEAgent
+# for GPIO UART
 sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 2000000
+# for FTDI etc.
+sudo MicroXRCEAgent serial --dev /dev/serial/by-path/platform-xhci-hcd.1-usb-0:2:1.0-port0 -b 2000000
 
 # To use micro_ros_agent (preferred)
+# for GPIO UART
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyAMA0 -b 2000000
+# for FTDI etc.
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/serial/by-path/platform-xhci-hcd.1-usb-0:2:1.0-port0 -b 2000000
 ```
 
 ### for MAVROS (MAVLINK 2 must be enabled for FCU serial port)
@@ -22,6 +28,9 @@ source install/setup.bash
 
 # for FCU serial connector <-> PI5 header serial
 ros2 launch mavros apm.launch fcu_url:=/dev/ttyAMA0:2000000
+
+# for FCU serial connector <-> FTDI <-> PI5 USB
+ros2 launch mavros apm.launch fcu_url:=/dev/ttyUSB0:2000000
 
 # for FCU USB <-> PI5 USB
 ros2 launch mavros apm.launch fcu_url:=/dev/ttyACM0:2000000
@@ -36,13 +45,12 @@ source install/setup.bash
 ros2 launch robot_bringup robot_bringup.launch.py
 ```
 
-## Robot Terminal 3
+## Robot or Host Terminal (possibly better on faster host?)
 ### Launch Navigation
 ```
 ros2 launch nav2_bringup navigation_launch.py params_file:="/home/ros/ros2_mowbot_ws/src/robot_bringup/config/navigation.config.yaml"
 ```
 
-## For RViz
 ## Host Terminal 1
 ### Start RViz2
 ```
@@ -64,7 +72,7 @@ ros2 launch teleop_twist_joy teleop-launch.py joy_config:='xbox' publish_stamped
 
 ## Service Calls
 ```
-# in DDS mode
+# in Ardupilot DDS mode
 ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors "{arm: true}"
 ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 15}"
 

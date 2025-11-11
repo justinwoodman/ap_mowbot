@@ -31,6 +31,16 @@ def generate_launch_description():
         executable='ap_cmd_vel_bridge',
     )
 
+    px4_odometry_bridge_node = Node(
+        package='px4_bridges',
+        executable='odometry_bridge',
+    )
+
+    px4_navsat_bridge_node = Node(
+        package='px4_bridges',
+        executable='navsat_bridge',
+    )
+
     lidar_node = Node(
         package='sllidar_ros2',
         executable='sllidar_node',
@@ -79,9 +89,12 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
         robot_state_publisher_node,
-        ardupilot_odometry_bridge_node,
-        ardupilot_navsat_bridge_node,
-        ardupilot_cmd_vel_bridge_node,
+        #ardupilot_odometry_bridge_node,
+        #ardupilot_navsat_bridge_node,
+        #ardupilot_cmd_vel_bridge_node,
+        px4_odometry_bridge_node,
+        px4_navsat_bridge_node,
+        #px4_cmd_vel_bridge_node,
         lidar_node,
         #realsense_node,
         #navigation_node,
