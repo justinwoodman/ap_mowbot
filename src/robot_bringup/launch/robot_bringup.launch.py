@@ -41,6 +41,11 @@ def generate_launch_description():
         executable='navsat_bridge',
     )
 
+    px4_cmd_vel_bridge_node = Node(
+        package='px4_bridges',
+        executable='cmd_vel_bridge',
+    )
+
     lidar_node = Node(
         package='sllidar_ros2',
         executable='sllidar_node',
@@ -94,7 +99,7 @@ def generate_launch_description():
         #ardupilot_cmd_vel_bridge_node,
         px4_odometry_bridge_node,
         px4_navsat_bridge_node,
-        #px4_cmd_vel_bridge_node,
+        px4_cmd_vel_bridge_node,
         lidar_node,
         #realsense_node,
         #navigation_node,

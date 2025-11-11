@@ -25,7 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'odometry_bridge = px4_bridges.odometry_bridge:main',
-            'navsat_bridge = px4_bridges.navsat_bridge:main'
+            'navsat_bridge = px4_bridges.navsat_bridge:main',
+            'cmd_vel_bridge = px4_bridges.cmd_vel_bridge:main'
         ],
     },
 )
