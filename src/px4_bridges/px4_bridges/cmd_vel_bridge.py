@@ -77,21 +77,15 @@ class Px4CmdVelBridge(Node):
         # Create and publish RoverRateSetpoint
         rate_msg = RoverRateSetpoint()
         rate_msg.timestamp = self.get_clock().now().nanoseconds // 1000  # microseconds
-        rate_msg.forward_speed_setpoint = float(msg.linear.x)
-        rate_msg.forward_speed_setpoint_normalized = float('nan')  # Not used
         rate_msg.yaw_rate_setpoint = float(msg.angular.z)
-        rate_msg.yaw_rate_setpoint_normalized = float('nan')  # Not used
         
         self.rate_setpoint_pub.publish(rate_msg)
         
         # Create and publish RoverSpeedSetpoint
         speed_msg = RoverSpeedSetpoint()
         speed_msg.timestamp = self.get_clock().now().nanoseconds // 1000  # microseconds
-        speed_msg.forward_speed_setpoint = float(msg.linear.x)
-        speed_msg.forward_speed_setpoint_normalized = float('nan')  # Not used
-        speed_msg.yaw_setpoint = float('nan')  # Not used in rate control
-        speed_msg.yaw_rate_setpoint = float(msg.angular.z)
-        speed_msg.yaw_rate_setpoint_normalized = float('nan')  # Not used
+        speed_msg.speed_body_x = float(msg.linear.x)
+        speed_msg.speed_body_y = float(msg.linear.y)
         
         self.speed_setpoint_pub.publish(speed_msg)
         
