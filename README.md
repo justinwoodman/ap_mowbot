@@ -11,13 +11,13 @@ source install/setup.bash
 # for GPIO UART
 sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 2000000
 # for FTDI etc.
-sudo MicroXRCEAgent serial --dev /dev/serial/by-path/platform-xhci-hcd.1-usb-0:2:1.0-port0 -b 2000000
+sudo MicroXRCEAgent serial --dev /dev/ttyUSB0 -b 2000000
 
 # To use micro_ros_agent (preferred)
 # for GPIO UART
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyAMA0 -b 2000000
 # for FTDI etc.
-ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/serial/by-path/platform-xhci-hcd.1-usb-0:2:1.0-port0 -b 2000000
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0 -b 2000000
 ```
 
 ### for MAVROS (MAVLINK 2 must be enabled for FCU serial port)

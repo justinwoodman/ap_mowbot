@@ -31,6 +31,7 @@ def generate_launch_description():
         executable='ap_cmd_vel_bridge',
     )
 
+    '''
     px4_odometry_bridge_node = Node(
         package='px4_bridges',
         executable='odometry_bridge',
@@ -45,7 +46,8 @@ def generate_launch_description():
         package='px4_bridges',
         executable='cmd_vel_bridge',
     )
-
+    '''
+    
     lidar_node = Node(
         package='sllidar_ros2',
         executable='sllidar_node',
