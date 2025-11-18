@@ -1,5 +1,11 @@
 # Mowbot with ArduPilot Flight Controller & Raspberry Pi 5 Companion Computer
 ## Bringup Instructions
+
+## Mission Planner (to be replaced iwt hservice calls...)
+### Start RTK/GPS Inject
+### Must be in "Guided" mode
+### Must be armed
+
 ## Robot Terminal 1
 ### for DDS (DDS must be enabled for FCU serial port)
 ```
