@@ -40,9 +40,13 @@ class ArduPilotNavsatBridge(Node):
 
         self.navsat_pub = self.create_publisher(
             NavSatFix,
-            'ap/navsat/fix',
+            'gps/fix',
             qos_profile_cc
         )
+
+        self.get_logger().info('ardupilot_navsat_bridge node started')
+        self.get_logger().info('Subscribed to: /ap/navsat')
+        self.get_logger().info('Publishing to: /gps/fix')
 
     def navsat_callback(self, msg):
         msg.header.frame_id = 'gps'

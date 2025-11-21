@@ -69,6 +69,11 @@ class ArduPilotOdometryBridge(Node):
 
         # publish static transform
         self.publish_static_transform()
+
+        self.get_logger().info('ardupilot_odometry_bridge node started')
+        self.get_logger().info('Subscribed to: /ap/pose/filtered')
+        self.get_logger().info('Subscribed to: /ap/twist/filtered')
+        self.get_logger().info('Publishing to: /odometry/filtered')
     
     def pose_callback(self, msg):
         self.latest_pose = msg

@@ -47,6 +47,10 @@ class ArduPilotCmdVelBridge(Node):
             qos_profile_ap
         )
 
+        self.get_logger().info('ardupilot_cmd_vel_bridge node started')
+        self.get_logger().info('Subscribed to: /cmd_vel')
+        self.get_logger().info('Publishing to: /ap/cmd_vel')
+
     def cmd_vel_callback(self, msg):
         """Forward cmd_vel to ArduPilot with proper frame_id"""
         msg.header.frame_id = 'base_link'
